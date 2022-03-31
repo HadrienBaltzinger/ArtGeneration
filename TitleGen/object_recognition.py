@@ -30,4 +30,4 @@ def detect(img_path):
 
     return keywords, probas
 
-print(detect("Data/wikiart-base/Symbolism/frantisek-kupka_ballad-of-epona-1900.jpg"))
+# print(detect("Data/wikiart-base/Symbolism/frantisek-kupka_ballad-of-epona-1900.jpg"))

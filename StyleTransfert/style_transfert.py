@@ -277,7 +277,7 @@ def apply_style(content_path, style_path, result_path, epochs=10, weights=(2.5e-
             * style_weight = 1e-6
             * content_weight = 2.5e-8
     """    
-    
+
     start_time = time.time()
     optimizer = keras.optimizers.SGD(
         keras.optimizers.schedules.ExponentialDecay(
@@ -295,7 +295,7 @@ def apply_style(content_path, style_path, result_path, epochs=10, weights=(2.5e-
     print("Exécution terminée ... Temps de traitement : %s seconds" % (time.time() - start_time))
 
 
-content = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/test/Photo/0a7b607c9c.jpg"
-style = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/test/Symbolism/nicholas-roerich_message-from-shambhala-arrow-letter-1946.jpg"
-result = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/result/test3.jpg"
-apply_style(content, style, result, epochs=10)
+# content = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/test/Photo/0a7b607c9c.jpg"
+# style = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/test/Symbolism/nicholas-roerich_message-from-shambhala-arrow-letter-1946.jpg"
+# result = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/result/test3.jpg"
+# apply_style(content, style, result)
