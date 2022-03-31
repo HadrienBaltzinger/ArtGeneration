@@ -11,14 +11,19 @@ from TitleGen.object_recognition import detect
 
 #Import des fichiers du projets.
 
-#Variables du fichier à prédéfinir
+
+#Variables du fichier à prédéfinir  
 filedatapath = "Interface/data/"
 imagefilepath = "Interface/images/"
+styleimagefilepath = "Interface/style/"
+resultimagefilepath = "Interface/result/"
 styleselected = ""
 listfilename = listdir(imagefilepath)
 liststyle = ["style1", "style2", "style3", "style4"]
 width = 300
 height = 180
+widthR = 180
+heightR = 130
 padxf1 = 50
 padyf1 = 10
 path_list = []
@@ -26,6 +31,8 @@ images_reference_list = []
 project_name="Générateur de peintures"
 color1="#ebeeb0"
 color2="#92001f"
+resultitle = ""
+style = ["test, 10%","Test2, 50%","test3, 95%"]
 
 
 def New():
@@ -40,13 +47,33 @@ def New():
 def browseFiles(): 
     filepath = filedialog.askopenfilename(initialdir = "./", 
                                           title = "Select a File", 
-                                          filetypes = (("Text files", "*.txt*"), ("all files","*.*")))
-    n = str(len(listdir(imagefilepath))+1)                                      
+                                          filetypes = (("all files","*.*"), ("Text files", "*.txt*")))
+    # im = Image.open(filepath)
+    # im.save(imagefilepath)
     filename = basename(filepath)
     target = imagefilepath+filename
     copyfile(filepath, target)
     if filename not in listfilename:
         listfilename.append(filename)
+    RefreshWindow()
+
+def DeleteStyleImage():
+    listimagestyle = listdir(styleimagefilepath)
+    n = len(listimagestyle)
+    if n > 0:
+        for i in listimagestyle:
+            remove(styleimagefilepath + i)
+    else:
+        return True
+
+def browseFilesStyle(): 
+    DeleteStyleImage()
+    filepath = filedialog.askopenfilename(initialdir = "./", 
+                                          title = "Select a File", 
+                                          filetypes = (("all files","*.*"), ("Text files", "*.txt*")))
+    filename = basename(filepath)
+    target = styleimagefilepath+"style.jpg"
+    copyfile(filepath, target)
     RefreshWindow()
 
 def DeleteImage(event):
@@ -58,19 +85,21 @@ def DeleteImage(event):
     RefreshWindow()
 
 def RefreshWindow():
-    #display listbox left
+    #Affiche la listbox à gauche et ses éléments
     button_delete.delete(0, button_delete.size())   
     for i in range(0, len(listfilename)):
         button_delete.insert(i, listfilename[i])
 
-    #display image
+    #Affiche les image du milieu
     listimage = listdir(imagefilepath)
     listcanvas = [canvas1, canvas2, canvas3, canvas4, canvas5, canvas6]
     i = 0
     for i in range(0, len(listimage)) :
         file_path = imagefilepath + listfilename[-i-1]
         img = Image.open(file_path)
-        photo = ImageTk.PhotoImage(img)
+        #On resize l'image afin d'avoir un meilleur affichage
+        resized_img= img.resize((width+20,height+20), Image.ANTIALIAS)
+        photo = ImageTk.PhotoImage(resized_img)
         listcanvas[i].itemconfigure(listrefimage[i], image=photo)
         listcanvas[i].image = photo
         i = i+1
@@ -78,6 +107,20 @@ def RefreshWindow():
         for j in range(i, 6):
             listcanvas[j].itemconfigure(listrefimage[j], image=bgphoto)
             listcanvas[j].image = bgphoto
+    #Affiche l'image de style  à droite
+    listimagestyle = listdir(styleimagefilepath)
+    n = len(listimagestyle)
+    if n > 0 :
+        file_path = styleimagefilepath + listimagestyle[0]
+        img = Image.open(file_path)
+        resized_img= img.resize((widthR+20,heightR+20), Image.ANTIALIAS)
+        photo = ImageTk.PhotoImage(resized_img)
+        canvas_right.itemconfigure(refstyleimage, image=photo)
+        canvas_right.image = photo
+    elif n == 0:
+        canvas_right.itemconfigure(refstyleimage, image=bgphoto)
+        canvas_right.image = bgphoto
+
 
 
 def SelectStyle(event):
@@ -106,6 +149,21 @@ def Fusion():
     
     return True
 
+def SaveResult():
+
+    folder = filedialog.askdirectory(initialdir = "/", 
+                                          title = "Choisissez un dossier")
+    listresult = listdir(resultimagefilepath)
+    if len(listresult) > 0:
+        filename = listresult[0]
+        filepath = resultimagefilepath + listresult[0]
+        print(filepath)
+        target = folder+"/"+filename
+        print(target)
+        copyfile(filepath, target)
+    else:
+        return True
+
     
 
 
@@ -116,6 +174,7 @@ window = Tk()
 menu_bar = Menu(window)
 menu_file = Menu(menu_bar, tearoff = 0)
 menu_file.add_command(label="Nouveau", command=New)
+menu_file.add_command(label="Sauvegarder le résultats", command=SaveResult)
 menu_file.add_command(label="Quitter", command=window.quit)
 
 menu_edit = Menu(menu_bar, tearoff = 0)
@@ -205,31 +264,35 @@ canvas6.grid(column=2, row=1, padx=5, pady=5)
 
 #frame right
 
-label_right = Label(frame_right, text="Style", font=("Arial black", 20, 'bold'), padx=10, bd = 5, bg=color1, fg=color2, highlightbackground=color2, highlightthickness=5)
-label_right.grid(column = 0, row = 0, padx=20, pady=(23,0))
-image = PhotoImage(file = filedatapath + "lunes.png")
+label_right1 = Label(frame_right, text="Style", font=("Arial black", 20, 'bold'), padx=10, bd = 5, bg=color1, fg=color2, highlightbackground=color2, highlightthickness=5)
+label_right1.grid(column = 0, row = 0, padx=20, pady=(23,0))
 
+button_explore_right = Button(frame_right, text = "Choisir un style", command = browseFilesStyle, bd = 5, bg=color1, fg=color2)
+button_explore_right.grid(column = 0, row = 1, pady=(20,0))
 
-yDefilBR = Scrollbar(frame_listbox_right, orient='vertical')
-yDefilBR.grid(row=0, column=1, sticky='ns')
-listbox_style = Listbox(frame_listbox_right, height=12, yscrollcommand=yDefilBR.set)
-listbox_style.bind("<Double-1>", SelectStyle)
-yDefilBR['command'] = listbox_style.yview
-listbox_style.grid(column=0, row=0)
-for i in range(0, len(liststyle)):
-    listbox_style.insert(i, liststyle[i])
+canvas_right = Canvas(frame_right, width=widthR, height=heightR, highlightbackground=color2, highlightthickness=5)
+refstyleimage = canvas_right.create_image(0,0, anchor=NW, image=bgphoto)
+canvas_right.grid(column = 0, row = 2, pady=20)
 
+label_right2 = Label(frame_right, text="Style 1 :"+style[0]+"\nStyle 2 :"+style[1]+"\nStyle 3 :"+style[2], font=("Arial black", 8, 'bold'), padx=10, bd = 5, bg=color1, fg=color2)
+label_right2.grid(column=0, row=3)
 
-button_fusion = Button(frame_right, text = "Fusionner", font=("Arial black", 20, 'bold'), bd = 5, command = Fusion, bg=color1, fg=color2, highlightbackground=color2, highlightthickness=5)
-button_fusion.grid(column=0, row=3, padx=15, pady=10)
+button_fusion = Button(frame_right, text = "Fusionner", font=("Arial black", 20, 'bold'), bd = 5, command = Fusion, bg=color1, fg=color2, highlightbackground=color2, highlightcolor=color2, highlightthickness=5)
+button_fusion.grid(column=0, row=4, padx=15, pady=10)
 
 # frame bottom
 
 canvas_bottom = Canvas(frame_bottom, width=940, height=350, bg="#ffb592", highlightbackground=color2, highlightthickness=5)
 canvas_bottom.create_image(0,0, anchor=NW, image=bgphoto)
 canvas_bottom.grid(column=0, row=0, padx=5, pady=5)
-label_bottom = Label(frame_bottom, text="", font=("Arial black", 12, 'bold'), pady=5, bg=color1, fg=color2)
-label_bottom.grid(column=0, row=1)
+
+photosave = PhotoImage(file = filedatapath + "logo_save.png")
+photosave = photosave.subsample(10,10)
+save_button = Button(frame_bottom, image=photosave, command=SaveResult)
+save_button.grid(column=0, row=1, sticky=NW)
+
+label_bottom = Label(frame_bottom, text=resultitle, font=("Arial black", 8, 'bold'), pady=5, bg=color1, fg=color2)
+label_bottom.grid(column=1, row=1)
 
 
 frame_top.grid(column = 1, row = 0, pady=(30,0))
@@ -242,7 +305,7 @@ frame_listbox_right.grid(column=0, row=1, pady=(23,0))
 
 # frame_left.grid(column = 0, row = 0, sticky=W)
 # frame_right.grid(column = 1, row = 0, sticky=W)
-
+window.after(0,DeleteStyleImage)
 window.after(0, RefreshWindow)
 
 window.mainloop()
