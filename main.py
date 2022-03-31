@@ -24,6 +24,8 @@ width = 300
 height = 180
 widthR = 180
 heightR = 130
+widthB = 940
+heightB = 350
 padxf1 = 50
 padyf1 = 10
 path_list = []
@@ -120,6 +122,19 @@ def RefreshWindow():
     elif n == 0:
         canvas_right.itemconfigure(refstyleimage, image=bgphoto)
         canvas_right.image = bgphoto
+    #Affiche l'image de résultat en bas
+    listimageresult = listdir(resultimagefilepath)
+    n = len(listimageresult)
+    if n > 0 :
+        file_path = resultimagefilepath + listimageresult[0]
+        img = Image.open(file_path)
+        resized_img= img.resize((widthB+20,heightB+20), Image.ANTIALIAS)
+        photo = ImageTk.PhotoImage(resized_img)
+        canvas_bottom.itemconfigure(refresultimage, image=photo)
+        canvas_bottom.image = photo
+    elif n == 0:
+        canvas_bottom.itemconfigure(refresultimage, image=bgphoto)
+        canvas_bottom.image = bgphoto
 
 
 
@@ -282,8 +297,8 @@ button_fusion.grid(column=0, row=4, padx=15, pady=10)
 
 # frame bottom
 
-canvas_bottom = Canvas(frame_bottom, width=940, height=350, bg="#ffb592", highlightbackground=color2, highlightthickness=5)
-canvas_bottom.create_image(0,0, anchor=NW, image=bgphoto)
+canvas_bottom = Canvas(frame_bottom, width=widthB, height=heightB, bg="#ffb592", highlightbackground=color2, highlightthickness=5)
+refresultimage = canvas_bottom.create_image(0,0, anchor=NW, image=bgphoto)
 canvas_bottom.grid(column=0, row=0, padx=5, pady=5)
 
 photosave = PhotoImage(file = filedatapath + "logo_save.png")

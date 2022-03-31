@@ -46,7 +46,7 @@ tensorflow==2.4.1
 pixellib
 
 # Title Generator requirements
-keytotext
+keytotext==1.5.2
 yake
 translate
 
