@@ -54,6 +54,4 @@ pillow
 
 # reconnaissance de style requirements
 
-!pip install fastai --upgrade
-from unittest import result
-from PIL import Image
+fastai==2.5.5
