@@ -86,6 +86,17 @@ def SelectStyle(event):
     RefreshWindow()
 
 def Fusion():
+    # fusion d'élements
+
+
+    # application du style
+    style = "Interface/style/style.jpg"
+    content = "Interface/result/fusion.jpg"
+    img_result = "Interface/result/final.jpg"
+    apply_style(content, style, img_result)
+
+    # titre sur img_result
+     
 
     return True
 
