@@ -1,8 +1,3 @@
-# TODO
-# change the global constants according to the tree structure of the project
-# get the images from the user
-# return the final image properly
-
 #######################
 #                     #
 #       Imports       #
@@ -29,14 +24,16 @@ import math
 
 # Directory where everything is stored
 dir = "" 
+user_images = "../" 
 
 models = dir + "models/"
 work   = dir + "working_dir/"
 
-img    = work + "images/"
-elmnts = work + "elements/"
-mask   = work + "masks/"
-bg     = work + "background/"
+img      = user_images + "Interface/images/"
+elmnts   = work + "elements/"
+mask     = work + "masks/"
+bg       = work + "background/"
+resultat = user_images + "Interface/results/"
 
 #######################
 #                     #
@@ -285,7 +282,6 @@ def process_images(img_list):
 
         # Saves the image's mask
         mask_name = img_name + "_mask.jpg"
-        print(mask_name) # debug
         cv2.imwrite(mask_name, masked)
         os.system('mv ' + mask_name + ' "' + mask + mask_name + '"')
 
@@ -294,15 +290,6 @@ def process_images(img_list):
         # Prints a message to show the avancement
         print(img_name + " processed")
 
-    # Selects the image to extract the background
-    # min_i = len(img_dict[img_list[0]]["extracted_objects"])
-    # background_selected = img_list[0]
-
-    # for key in img_dict:
-    #     if len(img_dict[key]["extracted_objects"]) < min_i:
-    #         background_selected = key
-
-    # -------------------------------------------------------------
     # Selects the image to be used as background
     # Chooses the one with the smallest area extracted
     min_i = math.inf
@@ -318,13 +305,9 @@ def process_images(img_list):
                 if img_mask[i][j][0] == 255:
                     area += 1
 
-        print("   area of " + img_name + " = " + str(area)) # debug
-
         if area < min_i:
-            print("      New bg selected") # debug
             background_selected = img_name
             min_i = area
-    # -------------------------------------------------------------
 
     print("Selected '" + background_selected + "' as background")
 
@@ -355,10 +338,16 @@ if __name__ == '__main__':
     """
     start_time = time.time()
 
-    img_list = ["gioconda.jpg", "leRadeauDeLaMeduse.jpg", "LUltimaCena.jpg", "NascitaDiVenere.jpg"]
-
+    # Parses every image from the folder
+    img_list = []
+    for filename in os.listdir(img):
+        if (filename.endswith(".jpg") 
+        or filename.endswith(".jpeg") 
+        or filename.endswith(".png")):
+            img_list.append(filename)
+   
     final = process_images(img_list)
 
     print("--- %s seconds ---" % (time.time() - start_time))
 
-    cv2.imwrite("final_image.jpg", final) # debug
+    cv2.imwrite(resultat + "fusion.jpg", final)
