@@ -133,7 +133,7 @@ def SelectStyle(event):
 
 def Fusion():
     # fusion d'élements
-
+    os.system('python PaintingFusion/painting_fusion.py') 
 
     # application du style
     style = "Interface/style/style.jpg"
