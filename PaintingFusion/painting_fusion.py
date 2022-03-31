@@ -1,8 +1,3 @@
-# TODO
-# change the global constants according to the tree structure of the project
-# get the images from the user
-# return the final image properly
-
 #######################
 #                     #
 #       Imports       #
