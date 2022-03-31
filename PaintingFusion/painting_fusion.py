@@ -27,13 +27,13 @@ dir = ""
 user_images = "" 
 
 models = dir + "Models/fusion/"
-work   = dir + "working_dir/"
+work   = dir + "PaintingFusion/working_dir/"
 
 img      = user_images + "Interface/images/"
 elmnts   = work + "elements/"
 mask     = work + "masks/"
 bg       = work + "background/"
-resultat = user_images + "Interface/results/"
+resultat = user_images + "Interface/result/"
 
 #######################
 #                     #
