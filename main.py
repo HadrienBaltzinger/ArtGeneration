@@ -5,6 +5,9 @@ from shutil import *
 from ntpath import *
 from os import *
 from PIL import Image, ImageTk
+from StyleTransfert.style_transfert import apply_style
+from TitleGen.gen_title_from_keywords import predict
+from TitleGen.object_recognition import detect
 
 #Import des fichiers du projets.
 
@@ -96,8 +99,11 @@ def Fusion():
     apply_style(content, style, img_result)
 
     # titre sur img_result
-     
+    w, p = detect(img_result)
+    title = predict(w)
 
+    # TODO what you want from title
+    
     return True
 
     
