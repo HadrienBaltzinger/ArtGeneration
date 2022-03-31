@@ -5,6 +5,7 @@ from tensorflow.keras.applications import vgg19
 import matplotlib.pyplot as plt
 from skimage.io import imread
 from IPython.display import Image, display
+import time
 
 
 
@@ -55,7 +56,7 @@ def gram_matrix(x):
 # It is based on the gram matrices (which capture style) of
 # feature maps from the style reference image
 # and from the generated image
-def style_loss(style, result):
+def style_loss(style, result, target_size):
     S = gram_matrix(style)
     C = gram_matrix(result)
     channels = 3
@@ -70,7 +71,7 @@ def content_loss(content, result):
 
 # The 3rd loss function, total variation loss,
 # designed to keep the generated image locally coherent
-def total_variation_loss(x):
+def total_variation_loss(x, target_size):
   nrows, ncols = target_size
   a = tf.square(
     x[:, : nrows - 1, : ncols - 1, :] - x[:, 1:, : ncols - 1, :]
@@ -88,7 +89,8 @@ class StyleTransfertModel():
         self.target_size = get_dim(content_path)
         self.content_image = preprocess_image(content_path, self.target_size)
         self.style_image = preprocess_image(style_path, self.target_size)
-        self.result_image = tf.Variable(content_image)
+        self.result_image = tf.Variable(self.content_image)
+        self.result_path = result_path
         self.weights = weights
         self.build_model()
         self.set_losses_layers()
@@ -136,14 +138,14 @@ class StyleTransfertModel():
             layer_features = features[layer_name]
             style_reference_features = layer_features[1, :, :, :]
             combination_features = layer_features[2, :, :, :]
-            sl = style_loss(style_reference_features, combination_features)
+            sl = style_loss(style_reference_features, combination_features, self.target_size)
             loss += (style_weight / len(self.style_layer_names)) * sl
 
         # Add total variation loss
-        loss += total_variation_weight * total_variation_loss(self.result_image)
+        loss += total_variation_weight * total_variation_loss(self.result_image, self.target_size)
         return loss
 
-    @tf.function
+    # @tf.function
     def compute_loss_and_grads(self):
         with tf.GradientTape() as tape:
             loss = self.compute_loss()
@@ -173,13 +175,13 @@ class StyleTransfertModel():
             if i % save_rate == 0:
                 if verbose:
                     print("Iteration %d: loss=%.2f" % (i, loss))
-                img = deprocess_image(self.result_image.numpy(), self.target_size)
-                fname = self.result_path + "_at_iteration_%d.png" % i
-                keras.preprocessing.image.save_img(fname, img)
+                # img = deprocess_image(self.result_image.numpy(), self.target_size)
+                # fname = self.result_path #+ "_at_iteration_%d.png" % i
+                # keras.preprocessing.image.save_img(fname, img)
         # fin de l'entrainement
         print("--- \nFin de l'entrainemnt : loss finale = %.2f"%loss)
         # enregistrement de l'image résultat
-        img = deprocess_image(self.result_image.numpy())
+        img = deprocess_image(self.result_image.numpy(), self.target_size)
         keras.preprocessing.image.save_img(self.result_path, img)
         return history
 
@@ -193,6 +195,7 @@ def apply_style(content_path, style_path, result_path, epochs=50, weights=(2.5e-
     # content_weight = 2.5e-8
     # weights = (content_weight, style_weight, total_variation_weight)
 
+    start_time = time.time()
     optimizer = keras.optimizers.SGD(
         keras.optimizers.schedules.ExponentialDecay(
             initial_learning_rate=100.0, decay_steps=100, decay_rate=0.96
@@ -206,8 +209,11 @@ def apply_style(content_path, style_path, result_path, epochs=50, weights=(2.5e-
       nb_saves=0, 
       verbose=False
       )
+    
+    print("Exécution terminée ... Temps de traitement : %s seconds" % (time.time() - start_time))
 
 
-##### TODO : reste à faire 
-# définir les paths des différents images (tjrs stockées au mêmes endroits)
-# vérifier le temps d'exécution sans GPU + adapter le nombre d'épochs
+# content = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/test/Photo/0a7b607c9c.jpg"
+# style = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/test/Fauvism/joan-miro_not_detected_227963.jpg"
+# result = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/result/test2.jpg"
+# apply_style(content, style, result, epochs=10, weights=(2.5e-8, 1e-6, 1e-6))
