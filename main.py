@@ -5,12 +5,12 @@ from shutil import *
 from ntpath import *
 from os import *
 from PIL import Image, ImageTk
+
+#Import des fichiers du projets.
 from StyleTransfert.style_transfert import apply_style
 from TitleGen.gen_title_from_keywords import predict
 from TitleGen.object_recognition import detect
-
-#Import des fichiers du projets.
-
+from reconnaissance_de_style.reconnaissance_de_style import predict_result
 
 #Variables du fichier à prédéfinir  
 filedatapath = "Interface/data/"
@@ -19,7 +19,6 @@ styleimagefilepath = "Interface/style/"
 resultimagefilepath = "Interface/result/"
 styleselected = ""
 listfilename = listdir(imagefilepath)
-liststyle = ["style1", "style2", "style3", "style4"]
 width = 300
 height = 180
 widthR = 180
@@ -33,8 +32,8 @@ images_reference_list = []
 project_name="Générateur de peintures"
 color1="#ebeeb0"
 color2="#92001f"
-resultitle = ""
-style = ["test, 10%","Test2, 50%","test3, 95%"]
+resulttitle = ""
+style = []
 
 
 def New():
@@ -73,9 +72,13 @@ def browseFilesStyle():
     filepath = filedialog.askopenfilename(initialdir = "./", 
                                           title = "Select a File", 
                                           filetypes = (("all files","*.*"), ("Text files", "*.txt*")))
-    filename = basename(filepath)
     target = styleimagefilepath+"style.jpg"
     copyfile(filepath, target)
+    liststyle = predict_result(target)
+    global style
+    style[0] = liststyle[0][0]+" à "+str(liststyle[0][1])[:4]
+    style[1] = liststyle[1][0]+" à "+str(liststyle[1][1])[:4]
+    style[2] = liststyle[2][0]+" à "+str(liststyle[1][1])[:4]
     RefreshWindow()
 
 def DeleteImage(event):
@@ -128,6 +131,7 @@ def RefreshWindow():
     if n > 0 :
         file_path = resultimagefilepath + listimageresult[0]
         img = Image.open(file_path)
+
         resized_img= img.resize((widthB+20,heightB+20), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(resized_img)
         canvas_bottom.itemconfigure(refresultimage, image=photo)
@@ -136,15 +140,6 @@ def RefreshWindow():
         canvas_bottom.itemconfigure(refresultimage, image=bgphoto)
         canvas_bottom.image = bgphoto
 
-
-
-def SelectStyle(event):
-    global styleselected
-    w = event.widget
-    index = int(w.curselection()[0])
-    value = w.get(index)
-    styleselected = value
-    RefreshWindow()
 
 def Fusion():
     # fusion d'élements
@@ -156,12 +151,10 @@ def Fusion():
     img_result = "Interface/result/final.jpg"
     apply_style(content, style, img_result)
 
-    # titre sur img_result
+    # titre sur img_result et l'afficher
     w, p = detect(img_result)
-    title = predict(w)
-
-    # TODO what you want from title
-    
+    global resulttitle
+    resulttitle = predict(w)    
     return True
 
 def SaveResult():
@@ -306,7 +299,7 @@ photosave = photosave.subsample(10,10)
 save_button = Button(frame_bottom, image=photosave, command=SaveResult)
 save_button.grid(column=0, row=1, sticky=NW)
 
-label_bottom = Label(frame_bottom, text=resultitle, font=("Arial black", 8, 'bold'), pady=5, bg=color1, fg=color2)
+label_bottom = Label(frame_bottom, text=resulttitle, font=("Arial black", 8, 'bold'), pady=5, bg=color1, fg=color2)
 label_bottom.grid(column=1, row=1)
 
 
