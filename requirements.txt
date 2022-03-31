@@ -51,3 +51,9 @@ translate
 #Interface GUI Tkinter
 path
 pillow
+
+# reconnaissance de style requirements
+
+!pip install fastai --upgrade
+from unittest import result
+from PIL import Image
