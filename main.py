@@ -148,7 +148,7 @@ def SelectStyle(event):
 
 def Fusion():
     # fusion d'élements
-    os.system('python PaintingFusion/painting_fusion.py') 
+    system('python3 PaintingFusion/painting_fusion.py') 
 
     # application du style
     style = "Interface/style/style.jpg"
@@ -320,7 +320,6 @@ frame_listbox_right.grid(column=0, row=1, pady=(23,0))
 
 # frame_left.grid(column = 0, row = 0, sticky=W)
 # frame_right.grid(column = 1, row = 0, sticky=W)
-window.after(0,DeleteStyleImage)
 window.after(0, RefreshWindow)
 
 window.mainloop()

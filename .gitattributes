@@ -1,3 +1,4 @@
 *.bin filter=lfs diff=lfs merge=lfs -binary
 *.bin !text !filter !merge !diff
 pytorch_model.bin filter=lfs diff=lfs merge=lfs -text
+Models/fusion/mask_rcnn_coco.h5 filter=lfs diff=lfs merge=lfs -text
