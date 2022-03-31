@@ -126,9 +126,9 @@ def RefreshWindow():
     listimageresult = listdir(resultimagefilepath)
     n = len(listimageresult)
     if n > 0 :
-        file_path = resultimagefilepath + listimageresult[0]
+        file_path = resultimagefilepath + "/final.jpg"
         img = Image.open(file_path)
-        resized_img= img.resize((widthB+20,heightB+20), Image.ANTIALIAS)
+        resized_img= img.thumbnail((widthB+20,heightB+20), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(resized_img)
         canvas_bottom.itemconfigure(refresultimage, image=photo)
         canvas_bottom.image = photo
@@ -161,7 +161,7 @@ def Fusion():
     title = predict(w)
 
     # TODO what you want from title
-    
+    RefreshWindow()
     return True
 
 def SaveResult():
@@ -170,11 +170,8 @@ def SaveResult():
                                           title = "Choisissez un dossier")
     listresult = listdir(resultimagefilepath)
     if len(listresult) > 0:
-        filename = listresult[0]
-        filepath = resultimagefilepath + listresult[0]
-        print(filepath)
-        target = folder+"/"+filename
-        print(target)
+        filepath = resultimagefilepath + "/final.jpg"
+        target = folder+"/final.jpg"
         copyfile(filepath, target)
     else:
         return True

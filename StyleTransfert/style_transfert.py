@@ -264,7 +264,7 @@ class StyleTransfertModel():
 
 
 ### --- fonction principale ---
-def apply_style(content_path, style_path, result_path, epochs=10, weights=(2.5e-8, 1e-6, 1e-6)):
+def apply_style(content_path, style_path, result_path, epochs=15, weights=(2.5e-8, 1e-6, 1e-6)):
     """ Fonction principale : effectue le transfert de style d'une image à l'autre
 
     params :
