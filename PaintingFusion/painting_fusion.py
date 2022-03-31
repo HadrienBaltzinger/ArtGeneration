@@ -24,9 +24,9 @@ import math
 
 # Directory where everything is stored
 dir = "" 
-user_images = "../" 
+user_images = "" 
 
-models = dir + "models/"
+models = dir + "Models/fusion/"
 work   = dir + "working_dir/"
 
 img      = user_images + "Interface/images/"
