@@ -11,15 +11,34 @@ import time
 
 ### --- Fonctions utiles / processing des images ---
 def get_dim(content_image_path):
-  # Récupère les dimensions de l'image cible (longueur set et largeur proportionnelle)
-  width, height = keras.preprocessing.image.load_img(content_image_path).size
-  img_nrows = 400
-  img_ncols = int(width * img_nrows / height)
-  return img_nrows, img_ncols
+    """ Définit les dimensions de l'image cible
+
+    La longueur sera toujours de 400 pixels
+    La largeur est définie proportionellement pour ne pas déformer l'image
+
+    params : 
+        content_image_path (string): chemin vers l'image de contenu
+    
+    returns :
+        img_nrows : longueur cible de l'image
+        img_ncols : largeur cible de l'image 
+    """
+    width, height = keras.preprocessing.image.load_img(content_image_path).size
+    img_nrows = 400
+    img_ncols = int(width * img_nrows / height)
+    return img_nrows, img_ncols
 
 
 def preprocess_image(image_path, target_size):
-    # Util function to open, resize and format pictures into appropriate tensors
+    """Fonction qui ouvre, resize et formate une image
+
+    params :
+        image_path (string) : chemin vers l'image 
+        target_size (int, int) : dimensions de l'image cible
+
+    returns :
+        l'image formatée dans un tenseur
+    """
     img = keras.preprocessing.image.load_img(
         image_path, target_size=target_size
     )
@@ -30,13 +49,22 @@ def preprocess_image(image_path, target_size):
 
 
 def deprocess_image(x, target_size):
-    # Util function to convert a tensor into a valid image
+    """Fonction qui transforme une image tensorisée
+        en une image valide
+
+    params :
+        x (tf.tensor) : image tensorisée 
+        target_size (int, int) : dimensions de l'image cible
+
+    returns :
+        l'image dans un np.array
+    """
     x = x.reshape((*target_size, 3))
     # Remove zero-center by mean pixel
     x[:, :, 0] += 103.939
     x[:, :, 1] += 116.779
     x[:, :, 2] += 123.68
-    # 'BGR'->'RGB'
+    # transforme encodage BGR en RGB
     x = x[:, :, ::-1]
     x = np.clip(x, 0, 255).astype("uint8")
     return x
@@ -44,48 +72,92 @@ def deprocess_image(x, target_size):
 
 
 ### --- Fonctions de perte ---
-# The gram matrix of an image tensor (feature-wise outer product)
 def gram_matrix(x):
+    """Fonction qui calcule la Matrice de gram d'une image
+
+    params :
+        x (tf.tensor) : image tensorisée 
+
+    returns :
+        np.array, la matrice de gram
+    """
     x = tf.transpose(x, (2, 0, 1))
     features = tf.reshape(x, (tf.shape(x)[0], -1))
     gram = tf.matmul(features, tf.transpose(features))
     return gram
 
-# The "style loss" is designed to maintain
-# the style of the reference image in the generated image.
-# It is based on the gram matrices (which capture style) of
-# feature maps from the style reference image
-# and from the generated image
+
 def style_loss(style, result, target_size):
+    """Calcule la fonction de perte de style
+
+    Evalue la conservation du style entre l'image de style et l'image résultat
+
+    params :
+        style (tf.tensor) : image de style tensorisée 
+        result (tf.tensor) : image resultat tensorisée
+        target_size (int, int) : dimensions de l'image cible
+
+    returns :
+        float, une évaluation de la conservation du style
+    """
     S = gram_matrix(style)
     C = gram_matrix(result)
     channels = 3
     size = target_size[0]*target_size[1]
     return tf.reduce_sum(tf.square(S - C)) / (4.0 * (channels ** 2) * (size ** 2))
 
-# An auxiliary loss function
-# designed to maintain the "content" of the
-# base image in the generated image
+
 def content_loss(content, result):
+    """Calcule la fonction de perte de contenu
+
+    Evalue la conservation du contenu entre l'image de contenu et l'image résultat
+
+    params :
+        content (tf.tensor) : image de contenu tensorisée 
+        result (tf.tensor) : image resultat tensorisée
+
+    returns :
+        float, une évaluation de la conservation du contenu
+    """
     return tf.reduce_sum(tf.square(result - content))
 
-# The 3rd loss function, total variation loss,
-# designed to keep the generated image locally coherent
+
 def total_variation_loss(x, target_size):
-  nrows, ncols = target_size
-  a = tf.square(
-    x[:, : nrows - 1, : ncols - 1, :] - x[:, 1:, : ncols - 1, :]
-  )
-  b = tf.square(
-    x[:, : nrows - 1, : ncols - 1, :] - x[:, : nrows - 1, 1:, :]
-  )
-  return tf.reduce_sum(tf.pow(a + b, 1.25))
+    """Calcule la fonction de perte de cohérence locale
+
+    Evalue la cohérence locale de l'image générée
+
+    params :
+        x (tf.tensor) : image resultat tensorisée
+        target_size (int, int) : dimensions de l'image cible
+
+    returns :
+        float, une évaluation de la cohérence locale de l'image
+    """
+    nrows, ncols = target_size
+    a = tf.square(
+        x[:, : nrows - 1, : ncols - 1, :] - x[:, 1:, : ncols - 1, :]
+    )
+    b = tf.square(
+        x[:, : nrows - 1, : ncols - 1, :] - x[:, : nrows - 1, 1:, :]
+    )
+    return tf.reduce_sum(tf.pow(a + b, 1.25))
 
 
 
 ### --- Création du modèle ---
 class StyleTransfertModel():
-    def __init__(self, content_path, style_path, result_path, weights):
+    """ Classe correspondant à un modèle de transfert de style """
+
+    def __init__(self, content_path, style_path, result_path, weights=(2.5e-8, 1e-6, 1e-6)):
+        """ Initialisation de la classe
+
+        params :
+            content_path (string): chemin vers l'image source de contenu
+            style_path (string): chemin vers l'image source de style
+            result_path (string): chemin où sauvegarder l'image resultat
+            weights (float, float, float): poids à appliquer aux différentes losses
+        """
         self.target_size = get_dim(content_path)
         self.content_image = preprocess_image(content_path, self.target_size)
         self.style_image = preprocess_image(style_path, self.target_size)
@@ -96,15 +168,18 @@ class StyleTransfertModel():
         self.set_losses_layers()
     
     def build_model(self):
-        # Build a VGG19 model loaded with pre-trained ImageNet weights
+        """ Charge le modèle (VGG19) pré-entrainé sur ImageNet """
         model = vgg19.VGG19(weights="imagenet", include_top=False)
-        # Get the symbolic outputs of each "key" layer (we gave them unique names).
+        # sortie de chaque couche du réseau
         outputs_dict = dict([(layer.name, layer.output) for layer in model.layers])
-        # Set up a model that returns the activation values for every layer in VGG19 (as a dict).
+        # modele qui retourne les valeurs d'activation de chaque couche du réseau
         self.feature_extractor = keras.Model(inputs=model.inputs, outputs=outputs_dict)
 
     def set_losses_layers(self):
-        # List of layers to use for the style loss.
+        """ Définir les couches utilisées pour les deux fonctions de perte
+            * style_loss
+            * content_loss
+        """
         self.style_layer_names = [
             "block1_conv1",
             "block2_conv1",
@@ -112,28 +187,30 @@ class StyleTransfertModel():
             "block4_conv1",
             "block5_conv1",
         ]
-        # The layer to use for the content loss.
         self.content_layer_name = "block5_conv2"
     
-
+    
     def compute_loss(self):
+        """ Calcule les valeurs des 3 fonctions de pertes
+        Et en déduit la perte globale du réseau
+        """
         content_weight, style_weight, total_variation_weight = self.weights
         input_tensor = tf.concat(
             [self.content_image, self.style_image, self.result_image], axis=0
         )
         features = self.feature_extractor(input_tensor)
 
-        # Initialize the loss
+        # initialisation
         loss = tf.zeros(shape=())
 
-        # Add content loss
+        # content_loss
         layer_features = features[self.content_layer_name]
         content_image_features = layer_features[0, :, :, :]
         combination_features = layer_features[2, :, :, :]
         loss = loss + content_weight * content_loss(
             content_image_features, combination_features
         )
-        # Add style loss
+        # style_loss
         for layer_name in self.style_layer_names:
             layer_features = features[layer_name]
             style_reference_features = layer_features[1, :, :, :]
@@ -141,30 +218,33 @@ class StyleTransfertModel():
             sl = style_loss(style_reference_features, combination_features, self.target_size)
             loss += (style_weight / len(self.style_layer_names)) * sl
 
-        # Add total variation loss
+        # total_variation_loss
         loss += total_variation_weight * total_variation_loss(self.result_image, self.target_size)
         return loss
 
-    # @tf.function
+    @tf.function
     def compute_loss_and_grads(self):
+        """ Calcule les pertes et les gradients
+
+        tf.function pour gagner en efficacité de calcul
+        """
         with tf.GradientTape() as tape:
             loss = self.compute_loss()
         grads = tape.gradient(loss, self.result_image)
         return loss, grads
     
-    def train(self, optimizer, epochs, nb_saves=0, verbose=False):
-        """ entrainement du réseau sur les images données
+    def train(self, optimizer, epochs, verbose=False):
+        """ Entrainement du réseau sur les images données
+
+        L'image resultat est sauvegardée à l'adresse définie plus tot
 
         params:
-            content_image : image dont le contenu sera utilisé
-            style_image : image dont le style sera utilisé
-            result_path : chemin où sauvegarder les résultats successifs
-            result_image : contient
-            nb_saves : nombre de sauvegardes d'images à faire au long de l'entrainement
+            optimizer : optimiseur
+            epochs : nombre d'epochs d'entrainement
             verbose : indique s'il faut afficher les détails de l'entrainement
+        return:
+            history : l'historique de variation de la loss au cours de l'entrainement
         """
-
-        save_rate = int(epochs/nb_saves) if nb_saves !=0 else epochs
         history = []
 
         for i in range(1, epochs + 1):
@@ -172,12 +252,8 @@ class StyleTransfertModel():
             optimizer.apply_gradients([(grads, self.result_image)])
             # enregistrement de la loss
             history.append(loss)
-            if i % save_rate == 0:
-                if verbose:
-                    print("Iteration %d: loss=%.2f" % (i, loss))
-                # img = deprocess_image(self.result_image.numpy(), self.target_size)
-                # fname = self.result_path #+ "_at_iteration_%d.png" % i
-                # keras.preprocessing.image.save_img(fname, img)
+            if verbose:
+                print("Iteration %d: loss=%.2f" % (i, loss))
         # fin de l'entrainement
         print("--- \nFin de l'entrainemnt : loss finale = %.2f"%loss)
         # enregistrement de l'image résultat
@@ -188,13 +264,20 @@ class StyleTransfertModel():
 
 
 ### --- fonction principale ---
-def apply_style(content_path, style_path, result_path, epochs=50, weights=(2.5e-8, 1e-6, 1e-6)):
-    # Poids des composants de la loss (à optimiser)
-    # total_variation_weight = 1e-6
-    # style_weight = 1e-6
-    # content_weight = 2.5e-8
-    # weights = (content_weight, style_weight, total_variation_weight)
+def apply_style(content_path, style_path, result_path, epochs=10, weights=(2.5e-8, 1e-6, 1e-6)):
+    """ Fonction principale : effectue le transfert de style d'une image à l'autre
 
+    params :
+        content_path (string): chemin vers l'image source de contenu
+        style_path (string): chemin vers l'image source de style
+        result_path (string): chemin où sauvegarder l'image resultat
+        epochs (int): nombre d'epochs de l'entrainement
+        weights (float, float, float): poids à appliquer aux différentes losses
+            * total_variation_weight = 1e-6
+            * style_weight = 1e-6
+            * content_weight = 2.5e-8
+    """    
+    
     start_time = time.time()
     optimizer = keras.optimizers.SGD(
         keras.optimizers.schedules.ExponentialDecay(
@@ -206,7 +289,6 @@ def apply_style(content_path, style_path, result_path, epochs=50, weights=(2.5e-
     model.train(
       optimizer, 
       epochs, 
-      nb_saves=0, 
       verbose=False
       )
     
@@ -216,4 +298,4 @@ def apply_style(content_path, style_path, result_path, epochs=50, weights=(2.5e-
 content = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/test/Photo/0a7b607c9c.jpg"
 style = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/test/Symbolism/nicholas-roerich_message-from-shambhala-arrow-letter-1946.jpg"
 result = "/home/eisti/Desktop/ING3/PFE/ArtGeneration/Data/result/test3.jpg"
-apply_style(content, style, result, epochs=10, weights=(2.5e-8, 1e-6, 1e-6))
+apply_style(content, style, result, epochs=10)
