@@ -7,9 +7,9 @@ import numpy as np
 import os
 from PIL import Image
 
-test_img_path = '/content/drive/Shareddrives/PFE artists/reconnaissance_de_style/test/test_baroque.jpg'
-model_path = '/content/drive/Shareddrives/PFE artists/reconnaissance_de_style/'
-img_database_path = '/content/drive/Shareddrives/PFE artists/data/wikiart-base'
+# test_img_path = '/content/drive/Shareddrives/PFE artists/reconnaissance_de_style/test/test_baroque.jpg'
+model_path = 'ArtGeneration/reconnaissance_de_style/'
+# img_database_path = '/content/drive/Shareddrives/PFE artists/data/wikiart-base'
 
 def import_resize_data(database_path):
     data = ImageDataLoaders.from_folder(database_path, valid_pct=0.2, item_tfms=Resize(100))
@@ -48,7 +48,7 @@ def get_topk_prediction(learner,img_path,k):
         result.append([learner.dls.vocab[topk.indices[i]],float(100*topk.values[i])])
     return result
 
-def update_model(database_path,save_path):
+def update_model(database_path,save_path = model_path):
     """
     function to retrain model from a database and save it in 'save_path'
 
@@ -68,7 +68,7 @@ def update_model(database_path,save_path):
     learner = fit_model(learner)
     save_model(learner, save_path)
 
-def predict_result(img_path,load_path,k = 3):
+def predict_result(img_path,load_path = model_path,k = 3):
     """
     function to get the probability of an image 'img_path' to be in a class
     classe's names are stored in model.dls.vocab
