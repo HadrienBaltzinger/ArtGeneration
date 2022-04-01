@@ -341,7 +341,7 @@ frame_listbox_right.grid(column=0, row=1, pady=(23,0))
 # frame_left.grid(column = 0, row = 0, sticky=W)
 # frame_right.grid(column = 1, row = 0, sticky=W)
 window.after(0, RefreshWindow)
-window.after(0, AffectStyle)
+window.after(0, AffectStyle(styleimagefilepath + listdir(styleimagefilepath)[0]))
 
 window.mainloop()
 
