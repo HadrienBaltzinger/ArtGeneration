@@ -349,7 +349,8 @@ frame_listbox_right.grid(column=0, row=1, pady=(23,0))
 # frame_right.grid(column = 1, row = 0, sticky=W)
 
 window.after(0, AffectStyle(styleimagefilepath + listdir(styleimagefilepath)[0]))
-window.after(0, SetTitle("Interface/result/final.jpg"))
+img_result_tmp = "Interface/result/final.jpg"
+window.after(0, SetTitle(img_result_tmp))
 
 window.mainloop()
 
