@@ -159,7 +159,7 @@ def RefreshWindow():
             scale = scalew
         if scalew > 1 and scaleh > 1 :
             scale = max(scalew, scaleh)
-        resized_img = img.resize((w / scale,h / scale), Image.ANTIALIAS)
+        resized_img = img.resize((int(w / scale),int(h / scale)), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(resized_img)
         canvas_bottom.itemconfigure(refresultimage, image=photo)
         canvas_bottom.image = photo
