@@ -76,6 +76,13 @@ def DeleteStyleImage():
     else:
         return True
 
+def DisplayStyle(target):
+    liststyle = predict_result(target)
+    global style
+    style[0] = liststyle[0][0]+" à "+str(liststyle[0][1])[:4]
+    style[1] = liststyle[1][0]+" à "+str(liststyle[1][1])[:4]
+    style[2] = liststyle[2][0]+" à "+str(liststyle[1][1])[:4]
+
 def browseFilesStyle(): 
     DeleteStyleImage()
     filepath = filedialog.askopenfilename(initialdir = "./", 
@@ -83,11 +90,7 @@ def browseFilesStyle():
                                           filetypes = (("all files","*.*"), ("Text files", "*.txt*")))
     target = styleimagefilepath+"style.jpg"
     copyfile(filepath, target)
-    liststyle = predict_result(target)
-    global style
-    style[0] = liststyle[0][0]+" à "+str(liststyle[0][1])[:4]
-    style[1] = liststyle[1][0]+" à "+str(liststyle[1][1])[:4]
-    style[2] = liststyle[2][0]+" à "+str(liststyle[1][1])[:4]
+    DisplayStyle(target)
     RefreshWindow()
 
 def DeleteImage(event):
@@ -336,6 +339,7 @@ frame_listbox_right.grid(column=0, row=1, pady=(23,0))
 # frame_left.grid(column = 0, row = 0, sticky=W)
 # frame_right.grid(column = 1, row = 0, sticky=W)
 window.after(0, RefreshWindow)
+window.after(0, DisplayStyle)
 
 window.mainloop()
 
