@@ -167,7 +167,7 @@ def RefreshWindow():
         canvas_bottom.itemconfigure(refresultimage, image=bgphoto)
         canvas_bottom.image = bgphoto
 
-def SetTitle(pimg_result):
+def SetTitle(img_result):
     print("Generation du titre en cours ...")
     w, p = detect(img_result)
     resulttitle.set(predict(w))
