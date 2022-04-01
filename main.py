@@ -145,10 +145,21 @@ def RefreshWindow():
     if n > 0 :
         file_path = resultimagefilepath + "/final.jpg"
         img = Image.open(file_path)
-        mywidth = widthB
-        wpercent = (mywidth/float(img.size[0]))
-        hsize = int((float(img.size[1])*float(wpercent)))        
-        resized_img = img.resize((mywidth,hsize), Image.ANTIALIAS)
+        # mywidth = widthB
+        # wpercent = (mywidth/float(img.size[0]))
+        # hsize = int((float(img.size[1])*float(wpercent)))        
+        w, h = img.size
+        scalew = w / widthB
+        scaleh = h / heightB
+        if scalew <= 1 and scaleh <= 1 :
+            scale = max(scalew, scaleh)
+        if scalew <=1 and scaleh > 1:
+            scale = scaleh
+        if scalew > 1 and scaleh <= 1:
+            scale = scalew
+        if scalew > 1 and scaleh > 1 :
+            scale = max(scalew, scaleh)
+        resized_img = img.resize((w / scale,h / scale), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(resized_img)
         canvas_bottom.itemconfigure(refresultimage, image=photo)
         canvas_bottom.image = photo
