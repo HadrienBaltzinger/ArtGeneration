@@ -172,7 +172,6 @@ def SetTitle(img_result):
     w, p = detect(img_result)
     resulttitle.set(predict(w))
     RefreshWindow
-    return True
 
 def Fusion():
     # fusion d'élements
@@ -187,8 +186,6 @@ def Fusion():
     RefreshWindow()
 
     SetTitle(img_result)
-
-    return True
 
 def SaveResult():
 
