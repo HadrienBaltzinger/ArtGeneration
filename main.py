@@ -171,7 +171,7 @@ def SetTitle(img_result):
     print("Generation du titre en cours ...")
     w, p = detect(img_result)
     resulttitle.set(predict(w))
-    RefreshWindow
+    RefreshWindow()
 
 def Fusion():
     # fusion d'élements
