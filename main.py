@@ -79,9 +79,9 @@ def DeleteStyleImage():
 def AffectStyle(target):
     liststyle = predict_result(target)
     global style
-    style[0] = liststyle[0][0]+" à "+str(liststyle[0][1])[:4]
-    style[1] = liststyle[1][0]+" à "+str(liststyle[1][1])[:4]
-    style[2] = liststyle[2][0]+" à "+str(liststyle[1][1])[:4]
+    style[0] = liststyle[0][0]+" à "+str(liststyle[0][1])[:4]+"%."
+    style[1] = liststyle[1][0]+" à "+str(liststyle[1][1])[:4]+"%."
+    style[2] = liststyle[2][0]+" à "+str(liststyle[1][1])[:4]+"%."
     global textStyle
     textStyle.set("Style 1 :"+style[0]+"\nStyle 2 :"+style[1]+"\nStyle 3 :"+style[2])
 
