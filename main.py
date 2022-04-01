@@ -17,7 +17,6 @@ filedatapath = "Interface/data/"
 imagefilepath = "Interface/images/"
 styleimagefilepath = "Interface/style/"
 resultimagefilepath = "Interface/result/"
-styleselected = ""
 listfilename = listdir(imagefilepath)
 width = 300
 height = 180
@@ -33,15 +32,27 @@ project_name="Générateur de peintures"
 color1="#ebeeb0"
 color2="#92001f"
 resulttitle = ""
-style = []
+style = ["", "", ""]
 
 
 def New():
+    global style
+    style = ["", "", ""]
+    global resulttitle
+    resulttitle = ""
     for i in range(0, len(listfilename)):
         listfilename.pop()
     l = listdir(imagefilepath)
     for i in l:
         remove(imagefilepath + i)
+
+    l = listdir(styleimagefilepath)
+    for i in l:
+        remove(styleimagefilepath + i)
+
+    l = listdir(resultimagefilepath)
+    for i in l:
+        remove(resultimagefilepath + i)
     RefreshWindow()
 
    
@@ -131,7 +142,10 @@ def RefreshWindow():
     if n > 0 :
         file_path = resultimagefilepath + "/final.jpg"
         img = Image.open(file_path)
-        resized_img = img.thumbnail((widthR+20,heightR+20), Image.ANTIALIAS)
+        mywidth = widthB
+        wpercent = (mywidth/float(img.size[0]))
+        hsize = int((float(img.size[1])*float(wpercent)))        
+        resized_img = img.resize((mywidth,hsize), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(resized_img)
         canvas_bottom.itemconfigure(refresultimage, image=photo)
         canvas_bottom.image = bgphoto
@@ -146,6 +160,7 @@ def Fusion():
     content = "Interface/result/fusion.jpg"
     img_result = "Interface/result/final.jpg"
     apply_style(content, style, img_result)
+    RefreshWindow()
 
     # titre sur img_result et l'afficher
     w, p = detect(img_result)
@@ -153,7 +168,7 @@ def Fusion():
     global resulttitle
     resulttitle = predict(w)  
     RefreshWindow()
-    
+
     return True
 
 def SaveResult():

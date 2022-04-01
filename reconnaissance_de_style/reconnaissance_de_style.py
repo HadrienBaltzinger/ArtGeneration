@@ -8,8 +8,7 @@ import os
 from PIL import Image
 
 # test_img_path = '/content/drive/Shareddrives/PFE artists/reconnaissance_de_style/test/test_baroque.jpg'
-model_path = 'ArtGeneration/reconnaissance_de_style/'
-# img_database_path = '/content/drive/Shareddrives/PFE artists/data/wikiart-base'
+model_path = 'reconnaissance_de_style/'
 
 def import_resize_data(database_path):
     data = ImageDataLoaders.from_folder(database_path, valid_pct=0.2, item_tfms=Resize(100))
