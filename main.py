@@ -213,14 +213,11 @@ window = Tk()
 menu_bar = Menu(window)
 menu_file = Menu(menu_bar, tearoff = 0)
 menu_file.add_command(label="Nouveau", command=New)
+menu_file.add_command(label="Fusion", command=Fusion)
 menu_file.add_command(label="Sauvegarder le résultats", command=SaveResult)
 menu_file.add_command(label="Quitter", command=window.quit)
 
-menu_edit = Menu(menu_bar, tearoff = 0)
-menu_edit.add_command(label="Fusion", command=Fusion)
-
 menu_bar.add_cascade(label="File", menu=menu_file)
-menu_bar.add_cascade(label="Edit", menu=menu_edit)
 window.config(menu=menu_bar)
 
 #Personalisation
