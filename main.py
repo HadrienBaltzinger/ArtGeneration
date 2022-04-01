@@ -319,7 +319,7 @@ button_fusion.grid(column=0, row=4, padx=15, pady=10)
 # frame bottom
 
 canvas_bottom = Canvas(frame_bottom, width=widthB, height=heightB, bg="#ffb592", highlightbackground=color2, highlightthickness=5)
-refresultimage = canvas_bottom.create_image(0,0, image=bgphoto)
+refresultimage = canvas_bottom.create_image(0,0, anchor=NW, image=bgphoto)
 canvas_bottom.grid(column=0, row=0, columnspan= 2, padx=5, pady=5)
 
 photosave = PhotoImage(file = filedatapath + "logo_save.png")
