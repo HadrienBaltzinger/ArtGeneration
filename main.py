@@ -156,6 +156,12 @@ def RefreshWindow():
         canvas_bottom.itemconfigure(refresultimage, image=bgphoto)
         canvas_bottom.image = bgphoto
 
+def SetTitle(pimg_result):
+    print("Generation du titre en cours ...")
+    w, p = detect(img_result)
+    resulttitle.set(predict(w))
+    RefreshWindow
+    return True
 
 def Fusion():
     # fusion d'élements
@@ -169,14 +175,7 @@ def Fusion():
     print("Generation terminée ... rechargement de la page")
     RefreshWindow()
 
-    # titre sur img_result et l'afficher
-    print("Generation du titre en cours ...")
-    w, p = detect(img_result)
-
-    # global resulttitle
-    resulttitle.set(predict(w))  
-    print("Titre :", resulttitle)
-    RefreshWindow()
+    SetTitle(img_result)
 
     return True
 
@@ -340,8 +339,9 @@ frame_listbox_right.grid(column=0, row=1, pady=(23,0))
 
 # frame_left.grid(column = 0, row = 0, sticky=W)
 # frame_right.grid(column = 1, row = 0, sticky=W)
-window.after(0, RefreshWindow)
+
 window.after(0, AffectStyle(styleimagefilepath + listdir(styleimagefilepath)[0]))
+window.after(0, SetTitle("Interface/result/final.jpg"))
 
 window.mainloop()
 
