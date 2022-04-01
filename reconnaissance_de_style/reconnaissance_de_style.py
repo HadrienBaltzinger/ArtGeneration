@@ -33,8 +33,8 @@ def save_model(learner, save_path):
 
 def load_model(load_path):
     learner = load_learner(load_path+"learner-model")
-    model = learner.load(load_path+"style-r50")
-    return model
+    # model = learner.load(load_path+"style-r50")
+    return learner #model
 
 def get_topk_prediction(learner,img_path,k):
     result = []

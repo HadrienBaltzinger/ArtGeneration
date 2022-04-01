@@ -31,15 +31,13 @@ images_reference_list = []
 project_name="Générateur de peintures"
 color1="#ebeeb0"
 color2="#92001f"
-resulttitle = ""
-style = ["", "", ""]
 
 
 def New():
-    global style
+    # global style
     style = ["", "", ""]
-    global resulttitle
-    resulttitle = ""
+    # global resulttitle
+    resulttitle.set("")
     for i in range(0, len(listfilename)):
         listfilename.pop()
     l = listdir(imagefilepath)
@@ -86,7 +84,7 @@ def browseFilesStyle():
     target = styleimagefilepath+"style.jpg"
     copyfile(filepath, target)
     liststyle = predict_result(target)
-    global style
+    # global style
     style[0] = liststyle[0][0]+" à "+str(liststyle[0][1])[:4]
     style[1] = liststyle[1][0]+" à "+str(liststyle[1][1])[:4]
     style[2] = liststyle[2][0]+" à "+str(liststyle[1][1])[:4]
@@ -148,6 +146,9 @@ def RefreshWindow():
         resized_img = img.resize((mywidth,hsize), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(resized_img)
         canvas_bottom.itemconfigure(refresultimage, image=photo)
+        canvas_bottom.image = photo
+    elif n == 0:
+        canvas_bottom.itemconfigure(refresultimage, image=bgphoto)
         canvas_bottom.image = bgphoto
 
 
@@ -160,13 +161,16 @@ def Fusion():
     content = "Interface/result/fusion.jpg"
     img_result = "Interface/result/final.jpg"
     apply_style(content, style, img_result)
+    print("Generation terminée ... rechargement de la page")
     RefreshWindow()
 
     # titre sur img_result et l'afficher
+    print("Generation du titre en cours ...")
     w, p = detect(img_result)
 
-    global resulttitle
-    resulttitle = predict(w)  
+    # global resulttitle
+    resulttitle.set(predict(w))  
+    print("Titre :", resulttitle)
     RefreshWindow()
 
     return True
@@ -189,6 +193,13 @@ def SaveResult():
 
 
 window = Tk()
+
+resulttitle = StringVar(window)
+resulttitle.set("Titre de l'image")
+style = ["1", "2", "3"]
+textStyle = StringVar()
+textStyle.set("Style 1 :"+style[0]+"\nStyle 2 :"+style[1]+"\nStyle 3 :"+style[2])
+
 #bar de nav
 menu_bar = Menu(window)
 menu_file = Menu(menu_bar, tearoff = 0)
@@ -293,7 +304,7 @@ canvas_right = Canvas(frame_right, width=widthR, height=heightR, highlightbackgr
 refstyleimage = canvas_right.create_image(0,0, anchor=NW, image=bgphoto)
 canvas_right.grid(column = 0, row = 2, pady=20)
 
-label_right2 = Label(frame_right, text="Style 1 :"+style[0]+"\nStyle 2 :"+style[1]+"\nStyle 3 :"+style[2], font=("Arial black", 8, 'bold'), padx=10, bd = 5, bg=color1, fg=color2)
+label_right2 = Label(frame_right, textvariable=textStyle, font=("Arial black", 8, 'bold'), padx=10, bd = 5, bg=color1, fg=color2)
 label_right2.grid(column=0, row=3)
 
 button_fusion = Button(frame_right, text = "Fusionner", font=("Arial black", 20, 'bold'), bd = 5, command = Fusion, bg=color1, fg=color2, highlightbackground=color2, highlightcolor=color2, highlightthickness=5)
@@ -310,7 +321,7 @@ photosave = photosave.subsample(10,10)
 save_button = Button(frame_bottom, image=photosave, command=SaveResult)
 save_button.grid(column=0, row=1, sticky=NW)
 
-label_bottom = Label(frame_bottom, text=resulttitle, font=("Arial black", 8, 'bold'), pady=5, bg=color1, fg=color2)
+label_bottom = Label(frame_bottom, textvariable=resulttitle.get(), font=("Arial black", 8, 'bold'), pady=5, bg=color1, fg=color2)
 label_bottom.grid(column=1, row=1)
 
 
