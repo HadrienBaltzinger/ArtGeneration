@@ -76,12 +76,15 @@ def DeleteStyleImage():
     else:
         return True
 
-def DisplayStyle(target):
+def AffectStyle(target):
+    print(target)
     liststyle = predict_result(target)
     global style
+    print(style)
     style[0] = liststyle[0][0]+" à "+str(liststyle[0][1])[:4]
     style[1] = liststyle[1][0]+" à "+str(liststyle[1][1])[:4]
     style[2] = liststyle[2][0]+" à "+str(liststyle[1][1])[:4]
+    print(style)
 
 def browseFilesStyle(): 
     DeleteStyleImage()
@@ -90,7 +93,7 @@ def browseFilesStyle():
                                           filetypes = (("all files","*.*"), ("Text files", "*.txt*")))
     target = styleimagefilepath+"style.jpg"
     copyfile(filepath, target)
-    DisplayStyle(target)
+    AffectStyle(target)
     RefreshWindow()
 
 def DeleteImage(event):
@@ -301,7 +304,7 @@ canvas_right = Canvas(frame_right, width=widthR, height=heightR, highlightbackgr
 refstyleimage = canvas_right.create_image(0,0, anchor=NW, image=bgphoto)
 canvas_right.grid(column = 0, row = 2, pady=20)
 
-style = ["1", "2", "3"]
+style = ["", "", ""]
 textStyle = StringVar()
 textStyle.set("Style 1 :"+style[0]+"\nStyle 2 :"+style[1]+"\nStyle 3 :"+style[2])
 label_right2 = Label(frame_right, textvariable=textStyle, font=("Arial black", 8, 'bold'), padx=10, bd = 5, bg=color1, fg=color2)
@@ -325,7 +328,7 @@ save_button.grid(column=0, row=1, sticky=NW)
 resulttitle = StringVar(window)
 resulttitle.set("Titre de l'image")
 label_bottom = Label(frame_bottom, textvariable=resulttitle, font=("Arial black", 8, 'bold'), pady=5, bg=color1, fg=color2)
-label_bottom.grid(column=1, row=1, padx=15)
+label_bottom.grid(column=1, row=1, padx=15, sticky=NW)
 
 
 frame_top.grid(column = 1, row = 0, pady=(30,0))
@@ -339,7 +342,7 @@ frame_listbox_right.grid(column=0, row=1, pady=(23,0))
 # frame_left.grid(column = 0, row = 0, sticky=W)
 # frame_right.grid(column = 1, row = 0, sticky=W)
 window.after(0, RefreshWindow)
-window.after(0, DisplayStyle)
+window.after(0, AffectStyle)
 
 window.mainloop()
 
