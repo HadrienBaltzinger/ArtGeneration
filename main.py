@@ -77,14 +77,13 @@ def DeleteStyleImage():
         return True
 
 def AffectStyle(target):
-    print(target)
     liststyle = predict_result(target)
     global style
-    print(style)
     style[0] = liststyle[0][0]+" à "+str(liststyle[0][1])[:4]
     style[1] = liststyle[1][0]+" à "+str(liststyle[1][1])[:4]
     style[2] = liststyle[2][0]+" à "+str(liststyle[1][1])[:4]
-    print(style)
+    global textStyle
+    textStyle.set("Style 1 :"+style[0]+"\nStyle 2 :"+style[1]+"\nStyle 3 :"+style[2])
 
 def browseFilesStyle(): 
     DeleteStyleImage()
