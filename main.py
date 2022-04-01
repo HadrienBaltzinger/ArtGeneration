@@ -187,6 +187,9 @@ def Fusion():
 
     SetTitle(img_result)
 
+    global stylefusion
+    stylefusion.set(predict_result(img_result)[0][0])
+
 def SaveResult():
 
     folder = filedialog.askdirectory(initialdir = "/", 
@@ -329,8 +332,10 @@ save_button.grid(column=0, row=1, sticky=NW)
 
 
 resulttitle = StringVar(window)
-resulttitle.set("Titre de l'image")
-label_bottom = Label(frame_bottom, textvariable=resulttitle, font=("Arial black", 8, 'bold'), pady=5, bg=color1, fg=color2)
+resulttitle.set("titre de l'image")
+stylefusion = StringVar(window)
+stylefusion.set("style de l'image final")
+label_bottom = Label(frame_bottom, textvariable="Style le plus probable : "+ stylefusion + ", Titre : " + resulttitle, font=("Arial black", 8, 'bold'), pady=5, bg=color1, fg=color2)
 label_bottom.grid(column=1, row=1, padx=15, sticky=NW)
 
 
