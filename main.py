@@ -311,7 +311,7 @@ button_fusion.grid(column=0, row=4, padx=15, pady=10)
 
 canvas_bottom = Canvas(frame_bottom, width=widthB, height=heightB, bg="#ffb592", highlightbackground=color2, highlightthickness=5)
 refresultimage = canvas_bottom.create_image(0,0, anchor=NW, image=bgphoto)
-canvas_bottom.grid(column=0, row=0, padx=5, pady=5)
+canvas_bottom.grid(column=0, row=0, columnspan= 2, padx=5, pady=5)
 
 photosave = PhotoImage(file = filedatapath + "logo_save.png")
 photosave = photosave.subsample(10,10)
@@ -322,7 +322,7 @@ save_button.grid(column=0, row=1, sticky=NW)
 resulttitle = StringVar(window)
 resulttitle.set("Titre de l'image")
 label_bottom = Label(frame_bottom, textvariable=resulttitle, font=("Arial black", 8, 'bold'), pady=5, bg=color1, fg=color2)
-label_bottom.grid(column=1, row=1)
+label_bottom.grid(column=1, row=1, padx=15)
 
 
 frame_top.grid(column = 1, row = 0, pady=(30,0))
