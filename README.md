@@ -16,9 +16,9 @@ If you do not have Tkinter on your computer, use the following command to instal
 sudo apt-get install python3-tk
 ```
 
-Too start the GUI:
+Finally, you can start the GUI:
 ```bash
-python3 main.py
+python main.py
 ```
 
 Autors: 
