@@ -1,6 +1,6 @@
 # ArtGeneration
 
-### Welcome to or répository to generate an image from multiples paintings and to add the "style" of an other painting. 
+### Welcome at or répository where we generate an image from multiples paintings and add the "style" of an other painting. 
 You can launch an interface from your terminal
 
 To install the requirement:
